@@ -12,3 +12,6 @@ curl -o /tmp/aws-sam-cli-linux-x86_64.zip -L https://github.com/aws/aws-sam-cli/
 unzip /tmp/aws-sam-cli-linux-x86_64.zip -d /tmp/sam;
 sudo /tmp/sam/install;
 rm -rf /tmp/aws-sam-cli-linux-x86_64.zip /tmp/sam;
+
+# Cobra
+go install github.com/spf13/cobra-cli@v1.3.0;
