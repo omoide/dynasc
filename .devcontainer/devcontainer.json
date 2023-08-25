@@ -19,7 +19,7 @@
       "version": "20.10"
     },
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.20"
+      "version": "1.21"
     }
   },
 
@@ -32,7 +32,10 @@
         "go.testTimeout": "3600s",
         "go.testFlags": ["-v"],
         "go.useLanguageServer": true,
-        "go.toolsManagement.autoUpdate": true
+        "go.toolsManagement.autoUpdate": true,
+        "[go]": {
+          "editor.defaultFormatter": "golang.go"
+        }
       },
       "extensions": [
         "esbenp.prettier-vscode",
