@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "ignorePaths": [],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "childctx",
+    "cockroachdb",
+    "dbstream",
+    "dbstreams",
+    "dbstreamstypes",
+    "dbtypes",
+    "devcontainers",
+    "dynamodbstreams",
+    "dynasc",
+    "errgroup",
+    "itor",
+    "lambdatypes",
+    "mapstructure",
+    "newf",
+    "omoidecom",
+    "stretchr",
+    "wrapf"
+  ],
+  "ignoreWords": [],
+  "import": []
+}
