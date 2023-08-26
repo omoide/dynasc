@@ -19,6 +19,7 @@
     "mapstructure",
     "newf",
     "omoidecom",
+    "pflag",
     "stretchr",
     "wrapf"
   ],

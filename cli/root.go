@@ -16,7 +16,7 @@ import (
 
 // RootOption represents options for the root command.
 type RootOption struct {
-	Triggers       map[string][]string `mapstructure:"triggers"`
+	Triggers       map[string][]string `mapstructure:"-"`
 	DynamoEndpoint string              `mapstructure:"dynamo-endpoint"`
 	LambdaEndpoint string              `mapstructure:"lambda-endpoint"`
 }
@@ -127,21 +127,32 @@ func initRootOption(cmd *cobra.Command) (*RootOption, error) {
 	}
 	slog.Debug("Configuration has been initialized.", slog.Any("options", vi.AllSettings()))
 	// Initialize the option from the configuration.
-	opt := &RootOption{}
+	opt := &RootOption{
+		Triggers: map[string][]string{},
+	}
 	if err := vi.Unmarshal(opt); err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal the configuration into an option")
 	}
 	// Set triggers defined by flags or environment variables after normalization if the triggers is not initialized.
-	if len(opt.Triggers) == 0 {
-		triggers := map[string][]string{}
+	if vi.ConfigFileUsed() != "" {
+		triggers := []*struct {
+			Table     string   `mapstructure:"table"`
+			Functions []string `mapstructure:"functions"`
+		}{}
+		if err := vi.UnmarshalKey("triggers", &triggers); err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal the triggers")
+		}
+		for _, trigger := range triggers {
+			opt.Triggers[trigger.Table] = append(opt.Triggers[trigger.Table], trigger.Functions...)
+		}
+	} else {
 		for _, trigger := range vi.GetStringSlice("triggers") {
 			kv := strings.SplitN(trigger, "=", 2)
 			if len(kv) != 2 {
 				return nil, errors.Newf("failed to parse the trigger: %s: trigger must be in key=value format", kv)
 			}
-			triggers[kv[0]] = append(triggers[kv[0]], kv[1])
+			opt.Triggers[kv[0]] = append(opt.Triggers[kv[0]], kv[1])
 		}
-		opt.Triggers = triggers
 	}
 	return opt, nil
 }
