@@ -170,13 +170,21 @@ func (w *Worker) shards(ctx context.Context, streamARN string, lastEvaluatedShar
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute DynamoDBStreams#DescribeStream")
 	}
+	shards := []dbstreamstypes.Shard{}
+	for _, shard := range out.StreamDescription.Shards {
+		// Append only the opened shard.
+		if shard.SequenceNumberRange.EndingSequenceNumber != nil {
+			continue
+		}
+		shards = append(shards, shard)
+	}
 	// Get shard IDs that have not yet been retrieved, if the last evaluated shard ID is not empty.
 	if shardID := out.StreamDescription.LastEvaluatedShardId; shardID != nil {
-		shards, err := w.shards(ctx, streamARN, shardID)
+		extraShards, err := w.shards(ctx, streamARN, shardID)
 		if err != nil {
 			return nil, err
 		}
-		return append(out.StreamDescription.Shards, shards...), nil
+		return append(shards, extraShards...), nil
 	}
-	return out.StreamDescription.Shards, nil
+	return shards, nil
 }
