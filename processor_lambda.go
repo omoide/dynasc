@@ -44,10 +44,15 @@ func (p *LambdaProcessor) Process(ctx context.Context, functionName string, reco
 				SizeBytes:      *record.Dynamodb.SizeBytes,
 				StreamViewType: string(record.Dynamodb.StreamViewType),
 			},
-			UserIdentity: &events.DynamoDBUserIdentity{
-				Type:        *record.UserIdentity.Type,
-				PrincipalID: *record.UserIdentity.PrincipalId,
-			},
+			UserIdentity: func() *events.DynamoDBUserIdentity {
+				if record.UserIdentity != nil {
+					return &events.DynamoDBUserIdentity{
+						Type:        *record.UserIdentity.Type,
+						PrincipalID: *record.UserIdentity.PrincipalId,
+					}
+				}
+				return nil
+			}(),
 		})
 	}
 	event := &events.DynamoDBEvent{
