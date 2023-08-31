@@ -23,6 +23,12 @@ services:
     image: amazon/dynamodb-local
     ports:
       - "8000:8000"
+    healthcheck:
+      test: "curl -s http://localhost:8000 -o /dev/null || exit 1"
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     command: "-jar DynamoDBLocal.jar -sharedDb"
   # DynamoDB Admin
   dynamodb_admin:
@@ -32,7 +38,26 @@ services:
     environment:
       DYNAMO_ENDPOINT: http://dynamodb:8000
     depends_on:
-      - dynamodb
+      dynamodb:
+        condition: service_healthy
+  # DynamoDB Initialize
+  dynamodb_initialize:
+    image: amazon/aws-cli
+    volumes:
+      - ../testdata/tables:/tmp/tables
+    env_file:
+      - ../.env
+    entrypoint: >
+      bash -c "
+        curl http://dynamodb:8000 --retry-connrefused -s --retry 3 > /dev/null;
+        for file in /tmp/tables/*
+        do
+          aws dynamodb --endpoint-url http://dynamodb:8000 create-table --cli-input-yaml file://$${file};
+        done
+      "
+    depends_on:
+      dynamodb:
+        condition: service_healthy
   # Lambda
   lambda:
     build:

@@ -1879,7 +1879,7 @@ func (s *WorkerIntegrationTestSuite) teardown(ctx context.Context, id string) er
 }
 
 func (s *WorkerIntegrationTestSuite) tableName(id string) string {
-	name := "TestTable"
+	name := "Test"
 	if id != "" {
 		return id + "." + name
 	}
