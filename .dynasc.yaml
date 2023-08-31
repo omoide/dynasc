@@ -1,0 +1,6 @@
+# This is a sample configuration file.
+dynamo-endpoint: http://dynamodb:8000
+lambda-endpoint: http://lambda:8080
+triggers:
+  - table: Test
+    functions: function
