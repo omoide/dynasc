@@ -2,7 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
 {
   "name": "Dynasc Dev Container",
-  "dockerComposeFile": ["docker-compose.yml", "../tools/docker-compose.yml"],
+  "dockerComposeFile": ["../tools/docker-compose.yml"],
   "service": "workspace",
   "workspaceFolder": "/workspaces/dynasc",
 
@@ -20,6 +20,9 @@
     },
     "ghcr.io/devcontainers/features/go:1": {
       "version": "1.21"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {
+      "version": "2.13.14"
     }
   },
 
