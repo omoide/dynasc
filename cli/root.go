@@ -177,6 +177,5 @@ func rootRun(ctx context.Context, opt *RootOption) error {
 		DB:        db,
 		DBStreams: dbstreams,
 		Processor: processor,
-		Triggers:  opt.Triggers,
-	}).Execute(ctx)
+	}).Execute(ctx, opt.Triggers)
 }

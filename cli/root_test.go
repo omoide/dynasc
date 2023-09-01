@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
@@ -102,18 +102,18 @@ func TestNewRootCmd(t *testing.T) {
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("#%02d:%s", i+1, tc.name), func(t *testing.T) {
 			cmd := NewRootCmd()
-			actual := func() *pflag.Flag {
+			flag := func() *pflag.Flag {
 				if tc.flag.persistent {
 					return cmd.PersistentFlags().Lookup(tc.flag.name)
 				} else {
 					return cmd.Flags().Lookup(tc.flag.name)
 				}
 			}()
-			assert.NotNil(t, actual)
-			assert.Equal(t, tc.flag.name, actual.Name)
-			assert.Equal(t, tc.flag.shorthand, actual.Shorthand)
-			assert.Equal(t, tc.flag.usage, actual.Usage)
-			assert.Equal(t, tc.flag.value, actual.DefValue)
+			assert.NotNil(t, flag)
+			assert.Equal(t, tc.flag.name, flag.Name)
+			assert.Equal(t, tc.flag.shorthand, flag.Shorthand)
+			assert.Equal(t, tc.flag.usage, flag.Usage)
+			assert.Equal(t, tc.flag.value, flag.DefValue)
 		})
 	}
 }
@@ -525,12 +525,12 @@ func TestInitRootOption(t *testing.T) {
 			}
 			cmd := tc.in.cmd(&cobra.Command{
 				Run: func(cmd *cobra.Command, args []string) {
-					actual, err := initRootOption(cmd)
+					option, err := initRootOption(cmd)
 					if tc.out.err != nil {
 						assert.ErrorContains(t, err, tc.out.err.Error())
 					} else {
 						assert.NoError(t, err)
-						assert.Equal(t, tc.out.opt, actual)
+						assert.Equal(t, tc.out.opt, option)
 					}
 				},
 			})

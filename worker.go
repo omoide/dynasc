@@ -2,6 +2,7 @@ package dynasc
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -17,9 +18,14 @@ type Worker struct {
 	db        DBClient
 	dbstreams DBStreamsClient
 	processor Processor
-	triggers  map[string][]string
 	batchSize *int32
 	hooks     *WorkerHooks
+}
+
+// WorkerHooks represents lifecycle hooks of a worker.
+type WorkerHooks struct {
+	PreSetup  func(ctx context.Context) error
+	PostSetup func(ctx context.Context) error
 }
 
 // NewWorker returns an instance of a worker.
@@ -28,7 +34,6 @@ func NewWorker(config *WorkerConfig, options ...WorkerConfigOption) *Worker {
 		db:        config.DB,
 		dbstreams: config.DBStreams,
 		processor: config.Processor,
-		triggers:  config.Triggers,
 		batchSize: Int32Ptr(100),
 		hooks:     &WorkerHooks{},
 	}
@@ -39,84 +44,87 @@ func NewWorker(config *WorkerConfig, options ...WorkerConfigOption) *Worker {
 }
 
 // Execute executes a worker.
-func (w *Worker) Execute(ctx context.Context) error {
-	return w.execute(WithWorkerHookManagerContext(ctx, NewWorkerHookManager(w.hooks)))
-}
-
-// execute executes a worker.
-func (w *Worker) execute(ctx context.Context) error {
-	WorkerHookManagerValue(ctx).executePreSetup(ctx)
-	// Generate triggers with stream ARN as the key.
-	triggers, err := ParallelMapToMapE(ctx, w.triggers, func(ctx context.Context, tableName string, functionNames []string) (string, []string, error) {
-		streamARN, err := w.streamARN(ctx, tableName)
-		if err != nil {
-			return "", nil, errors.Wrapf(err, "failed to get the stream ARN for %s table", tableName)
+func (w *Worker) Execute(ctx context.Context, triggers map[string][]string) error {
+	// Execute post setup function if specified.
+	if w.hooks.PreSetup != nil {
+		if err := w.hooks.PreSetup(ctx); err != nil {
+			return errors.Wrap(err, "failed to execute a pre setup function")
 		}
-		return StringValue(streamARN), functionNames, nil
-	})
+	}
+	// Set up the triggers.
+	// Generate a new trigger definition consisting of a map of shard iterators and function names.
+	triggers, err := w.setup(ctx, triggers)
 	if err != nil {
-		return errors.Wrap(err, "failed to generate triggers with stream ARN as the key")
+		return err
 	}
-	// Execute workers for the number of table streams.
-	eg, ctx := errgroup.WithContext(ctx)
-	for streamARN, functionNames := range triggers {
-		WorkerHookManagerValue(ctx).executePreStreamWorkerSetup(ctx, streamARN)
-		eg.Go(func(streamARN string, functionNames []string) func() error {
-			return func() error {
-				return w.executeStreamWorker(ctx, streamARN, functionNames)
-			}
-		}(streamARN, functionNames))
+	// Execute post setup function if specified.
+	if w.hooks.PostSetup != nil {
+		if err := w.hooks.PostSetup(ctx); err != nil {
+			return errors.Wrap(err, "failed to execute a post setup function")
+		}
 	}
-	eg.Go(func() error {
-		WorkerHookManagerValue(ctx).executePostSetup(ctx)
-		return nil
-	})
-	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "failed to process streams")
-	}
-	return nil
+	// Execute the workers.
+	return w.executeWorkers(ctx, triggers)
 }
 
-// executeStreamWorker executes a stream worker.
-func (w *Worker) executeStreamWorker(ctx context.Context, streamARN string, functionNames []string) error {
-	shards, err := w.shards(ctx, streamARN, nil)
-	if err != nil {
-		return errors.Wrapf(err, "failed to get the shards of the specified stream: %s", streamARN)
-	}
-	// Execute workers for the number of shards.
+// setup setups shard iterators and return them with their corresponding function names.
+func (w *Worker) setup(ctx context.Context, triggers map[string][]string) (map[string][]string, error) {
+	mu := sync.RWMutex{}
 	eg, ctx := errgroup.WithContext(ctx)
-	for _, shard := range shards {
-		WorkerHookManagerValue(ctx).executePreShardWorkerSetup(ctx, streamARN, StringValue(shard.ShardId))
-		eg.Go(func(shardID *string) func() error {
-			return func() error {
-				return w.executeShardWorker(ctx, streamARN, StringValue(shardID), functionNames)
+	result := map[string][]string{}
+	for k, v := range triggers {
+		tableName, functionNames := k, v
+		eg.Go(func() error {
+			// Get the stream ARN
+			streamARN, err := w.streamARN(ctx, tableName)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get the stream ARN for the specified table [tableName: %s]", tableName)
 			}
-		}(shard.ShardId))
+			// Get the shards.
+			shards, err := w.shards(ctx, StringValue(streamARN), nil)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get the shards of the specified stream [tableName: %s] [streamARN: %s]", tableName, streamARN)
+			}
+			// Get the shard iterators.
+			for _, shard := range shards {
+				itor, err := w.shardIterator(ctx, StringValue(streamARN), StringValue(shard.ShardId))
+				if err != nil {
+					return errors.Wrapf(err, "failed to get the shard iterators for the specified shard [tableName: %s] [streamARN: %s] [shardID: %s]", tableName, streamARN, StringValue(streamARN), StringValue(shard.ShardId))
+				}
+				// Set the set of function names for each iterator.
+				mu.Lock()
+				result[StringValue(itor)] = functionNames
+				mu.Unlock()
+			}
+			return nil
+		})
 	}
-	eg.Go(func() error {
-		WorkerHookManagerValue(ctx).executePostStreamWorkerSetup(ctx, streamARN)
-		return nil
-	})
 	if err := eg.Wait(); err != nil {
-		return errors.Wrap(err, "failed to process shards")
+		return nil, errors.Wrap(err, "failed to setup some triggers")
+	}
+	return result, nil
+}
+
+// execute executes workers.
+func (w *Worker) executeWorkers(ctx context.Context, triggers map[string][]string) error {
+	// Execute shard workers.
+	eg, ctx := errgroup.WithContext(ctx)
+	for k, v := range triggers {
+		itor, functionNames := k, v
+		eg.Go(func() error {
+			return w.executeShardWorker(ctx, itor, functionNames)
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return errors.Wrap(err, "failed to execute some shard workers")
 	}
 	return nil
 }
 
 // executeShardWorker executes a shard worker.
-func (w *Worker) executeShardWorker(ctx context.Context, streamARN, shardID string, functionNames []string) error {
+func (w *Worker) executeShardWorker(ctx context.Context, itor string, functionNames []string) error {
 	limiter := rate.NewLimiter(rate.Every(time.Second/4), 1)
-	// Get a shard iterator.
-	itor, err := w.dbstreams.GetShardIterator(ctx, &dynamodbstreams.GetShardIteratorInput{
-		StreamArn:         &streamARN,
-		ShardId:           &shardID,
-		ShardIteratorType: dbstreamstypes.ShardIteratorTypeLatest,
-	})
-	if err != nil {
-		return errors.Wrap(err, "failed to execute DynamoDBStreams#GetShardIterators")
-	}
-	WorkerHookManagerValue(ctx).executePostShardWorkerSetup(ctx, streamARN, shardID)
-	for next := itor.ShardIterator; next != nil; {
+	for next := &itor; next != nil; {
 		if err := limiter.Wait(ctx); err != nil {
 			return errors.Wrap(err, "failed to wait")
 		}
@@ -135,22 +143,21 @@ func (w *Worker) executeShardWorker(ctx context.Context, streamARN, shardID stri
 		}
 		// Process records.
 		eg, ctx := errgroup.WithContext(ctx)
-		for _, name := range functionNames {
-			eg.Go(func(name string) func() error {
-				return func() error {
-					return w.processor.Process(ctx, name, out.Records)
-				}
-			}(name))
+		for _, v := range functionNames {
+			name := v
+			eg.Go(func() error {
+				return w.processor.Process(ctx, name, out.Records)
+			})
 		}
 		if err := eg.Wait(); err != nil {
-			return errors.Wrap(err, "failed to process records")
+			return errors.Wrap(err, "failed to process some records")
 		}
 		next = out.NextShardIterator
 	}
 	return nil
 }
 
-// streamARN returns the Amazon Resource Name (ARN) that uniquely identifies the latest stream for specified table.
+// streamARN returns the latest stream ARN for the specified table.
 func (w *Worker) streamARN(ctx context.Context, tableName string) (*string, error) {
 	out, err := w.db.DescribeTable(ctx, &dynamodb.DescribeTableInput{
 		TableName: StringPtr(tableName),
@@ -161,7 +168,7 @@ func (w *Worker) streamARN(ctx context.Context, tableName string) (*string, erro
 	return out.Table.LatestStreamArn, nil
 }
 
-// shards returns the uniquely identified group of stream records within a stream.
+// shards returns the shards for the specified stream.
 func (w *Worker) shards(ctx context.Context, streamARN string, lastEvaluatedShardID *string) ([]dbstreamstypes.Shard, error) {
 	out, err := w.dbstreams.DescribeStream(ctx, &dynamodbstreams.DescribeStreamInput{
 		StreamArn:             &streamARN,
@@ -187,4 +194,17 @@ func (w *Worker) shards(ctx context.Context, streamARN string, lastEvaluatedShar
 		return append(shards, extraShards...), nil
 	}
 	return shards, nil
+}
+
+// shardIterator returns the iterator for the specified shard.
+func (w *Worker) shardIterator(ctx context.Context, streamARN, shardID string) (*string, error) {
+	out, err := w.dbstreams.GetShardIterator(ctx, &dynamodbstreams.GetShardIteratorInput{
+		StreamArn:         &streamARN,
+		ShardId:           &shardID,
+		ShardIteratorType: dbstreamstypes.ShardIteratorTypeLatest,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute DynamoDBStreams#GetShardIterators")
+	}
+	return out.ShardIterator, nil
 }

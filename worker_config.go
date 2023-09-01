@@ -5,7 +5,6 @@ type WorkerConfig struct {
 	DB        DBClient
 	DBStreams DBStreamsClient
 	Processor Processor
-	Triggers  map[string][]string
 }
 
 // WorkerConfigOption represents a function to set optional configuration.
@@ -21,6 +20,8 @@ func WithBatchSize(batchSize int32) WorkerConfigOption {
 // WithBatchSize returns a function that set hooks to a worker.
 func WithHooks(hooks *WorkerHooks) WorkerConfigOption {
 	return func(w *Worker) {
-		w.hooks = hooks
+		if hooks != nil {
+			w.hooks = hooks
+		}
 	}
 }
