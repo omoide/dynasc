@@ -94,7 +94,9 @@ func initLogger(cmd *cobra.Command) error {
 func initConfig(cmd *cobra.Command) (*viper.Viper, error) {
 	vi := viper.New()
 	// Bind the flags.
-	vi.BindPFlags(cmd.Flags())
+	if err := vi.BindPFlags(cmd.Flags()); err != nil {
+		return nil, errors.Wrap(err, "failed to bind flags")
+	}
 	// Define the bindings for the environment variables.
 	vi.AutomaticEnv()
 	vi.SetEnvPrefix("dynasc")

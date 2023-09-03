@@ -72,7 +72,7 @@ type DBClient interface {
 func NewDBClient(ctx context.Context, endpoint string) (*dynamodb.Client, error) {
 	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
 	if err != nil {
-		errors.Wrap(err, "failed to load the AWS default configuration")
+		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
 	return dynamodb.NewFromConfig(config), nil
 }
@@ -88,7 +88,7 @@ type DBStreamsClient interface {
 func NewDBStreamsClient(ctx context.Context, endpoint string) (*dynamodbstreams.Client, error) {
 	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
 	if err != nil {
-		errors.Wrap(err, "failed to load the AWS default configuration")
+		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
 	return dynamodbstreams.NewFromConfig(config), nil
 }
@@ -167,7 +167,7 @@ type LambdaClient interface {
 func NewLambdaClient(ctx context.Context, endpoint string) (*lambda.Client, error) {
 	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
 	if err != nil {
-		errors.Wrap(err, "failed to load the AWS default configuration")
+		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
 	return lambda.NewFromConfig(config), nil
 }

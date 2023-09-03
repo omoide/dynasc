@@ -14,6 +14,7 @@
     "dynamodbstreams",
     "dynasc",
     "errgroup",
+    "golangci",
     "itor",
     "lambdatypes",
     "mapstructure",
