@@ -1824,6 +1824,9 @@ func (s *WorkerIntegrationTestSuite) TestExecute() {
 
 func (s *WorkerIntegrationTestSuite) execute(ctx context.Context, do func(t *testing.T, id string)) func(t *testing.T) {
 	return func(t *testing.T) {
+		if testing.Short() {
+			t.Skip("skipping test in short mode")
+		}
 		// Use a random ID as a table prefix for each test to allow parallel execution of test.
 		id := RandomString(20)
 		// Execute a setup function.
