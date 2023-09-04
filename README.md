@@ -1,5 +1,11 @@
 # dynasc
 
+A cross-platform client tool for DynamoDB Streams written in Go.
+
+[![GitHub Actions](https://github.com/omoidecom/dynasc/actions/workflows/test.yaml/badge.svg)](https://github.com/omoidecom/dynasc/actions?query=branch%3Amaster+workflow%3Atest)
+
+## Overview
+
 Dynasc (**Dyna**moDB **S**treams **C**lient) is a client tool for processing stream records written by DynamoDB Streams.
 
 Dynasc reads the stream records from the any shards in DynamoDB Streams and invokes any lambda functions with the payloads that contain the DynamoDB Streams record event.
