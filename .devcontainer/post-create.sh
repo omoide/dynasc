@@ -9,3 +9,6 @@ rm -rf /tmp/aws-sam-cli-linux-x86_64.zip /tmp/sam;
 
 # Cobra
 go install github.com/spf13/cobra-cli@v1.3.0;
+
+# Go Releaser
+go install github.com/goreleaser/goreleaser@latest
