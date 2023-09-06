@@ -4,6 +4,7 @@
   "dictionaryDefinitions": [],
   "dictionaries": [],
   "words": [
+    "buildx",
     "childctx",
     "cockroachdb",
     "dbstream",
@@ -11,6 +12,7 @@
     "dbstreamstypes",
     "dbtypes",
     "devcontainers",
+    "dockerhub",
     "dynamodbstreams",
     "dynasc",
     "errgroup",

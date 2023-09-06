@@ -7,26 +7,87 @@ builds:
       - CGO_ENABLED=0
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
-    #
-    # Default: [ 'darwin', 'linux', 'windows' ]
     goos:
       - linux
       - windows
       - darwin
     # GOARCH to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
-    #
-    # Default: [ '386', 'amd64', 'arm64' ]
     goarch:
       - "386"
       - amd64
       - arm64
     # Custom ldflags.
-    #
-    # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'
-    # Templates: allowed
     ldflags:
       - -s -w -X github.com/omoidecom/dynasc/cli.version={{.Version}}
+
+dockers:
+  # Linux i386
+  - goos: linux
+    goarch: "386"
+    # Templates of the Docker image names.
+    image_templates:
+      - "omoidecom/dynasc:latest-i386"
+      - "omoidecom/dynasc:{{ .Major }}-i386"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-i386"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386"
+    dockerfile: ./build/Dockerfile
+    use: buildx
+    # Docker build flags.
+    build_flag_templates:
+      - "--platform=linux/386"
+
+  # Linux AMD64
+  - goos: linux
+    goarch: amd64
+    # Templates of the Docker image names.
+    image_templates:
+      - "omoidecom/dynasc:latest-amd64"
+      - "omoidecom/dynasc:{{ .Major }}-amd64"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-amd64"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64"
+    dockerfile: ./build/Dockerfile
+    use: buildx
+    # Docker build flags.
+    build_flag_templates:
+      - "--platform=linux/amd64"
+
+  # Linux ARM64
+  - goos: linux
+    goarch: arm64
+    # Templates of the Docker image names.
+    image_templates:
+      - "omoidecom/dynasc:latest-arm64"
+      - "omoidecom/dynasc:{{ .Major }}-arm64"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-arm64"
+      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64"
+    dockerfile: ./build/Dockerfile
+    use: buildx
+    # Docker build flags.
+    build_flag_templates:
+      - "--platform=linux/arm64"
+
+docker_manifests:
+  - name_template: omoidecom/dynasc:latest
+    image_templates:
+      - omoidecom/dynasc:latest-i386
+      - omoidecom/dynasc:latest-amd64
+      - omoidecom/dynasc:latest-arm64
+  - name_template: omoidecom/dynasc:{{ .Major }}
+    image_templates:
+      - omoidecom/dynasc:{{ .Major }}-i386
+      - omoidecom/dynasc:{{ .Major }}-amd64
+      - omoidecom/dynasc:{{ .Major }}-arm64
+  - name_template: omoidecom/dynasc:{{ .Major }}.{{ .Minor }}
+    image_templates:
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-i386
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-amd64
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-arm64
+  - name_template: omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}
+    image_templates:
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64
+      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64
 
 archives:
   - format: tar.gz
