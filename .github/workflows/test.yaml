@@ -1,6 +1,12 @@
 name: test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore:
+      - "v*.*.*"
+  pull_request:
 
 jobs:
   lint:
