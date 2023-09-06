@@ -27,10 +27,10 @@ dockers:
     goarch: "386"
     # Templates of the Docker image names.
     image_templates:
-      - "omoidecom/dynasc:latest-i386"
-      - "omoidecom/dynasc:{{ .Major }}-i386"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-i386"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386"
+      - "omoide/dynasc:latest-i386"
+      - "omoide/dynasc:{{ .Major }}-i386"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}-i386"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386"
     dockerfile: ./build/Dockerfile
     use: buildx
     # Docker build flags.
@@ -42,10 +42,10 @@ dockers:
     goarch: amd64
     # Templates of the Docker image names.
     image_templates:
-      - "omoidecom/dynasc:latest-amd64"
-      - "omoidecom/dynasc:{{ .Major }}-amd64"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-amd64"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64"
+      - "omoide/dynasc:latest-amd64"
+      - "omoide/dynasc:{{ .Major }}-amd64"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}-amd64"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64"
     dockerfile: ./build/Dockerfile
     use: buildx
     # Docker build flags.
@@ -57,10 +57,10 @@ dockers:
     goarch: arm64
     # Templates of the Docker image names.
     image_templates:
-      - "omoidecom/dynasc:latest-arm64"
-      - "omoidecom/dynasc:{{ .Major }}-arm64"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-arm64"
-      - "omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64"
+      - "omoide/dynasc:latest-arm64"
+      - "omoide/dynasc:{{ .Major }}-arm64"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}-arm64"
+      - "omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64"
     dockerfile: ./build/Dockerfile
     use: buildx
     # Docker build flags.
@@ -68,26 +68,26 @@ dockers:
       - "--platform=linux/arm64"
 
 docker_manifests:
-  - name_template: omoidecom/dynasc:latest
+  - name_template: omoide/dynasc:latest
     image_templates:
-      - omoidecom/dynasc:latest-i386
-      - omoidecom/dynasc:latest-amd64
-      - omoidecom/dynasc:latest-arm64
-  - name_template: omoidecom/dynasc:{{ .Major }}
+      - omoide/dynasc:latest-i386
+      - omoide/dynasc:latest-amd64
+      - omoide/dynasc:latest-arm64
+  - name_template: omoide/dynasc:{{ .Major }}
     image_templates:
-      - omoidecom/dynasc:{{ .Major }}-i386
-      - omoidecom/dynasc:{{ .Major }}-amd64
-      - omoidecom/dynasc:{{ .Major }}-arm64
-  - name_template: omoidecom/dynasc:{{ .Major }}.{{ .Minor }}
+      - omoide/dynasc:{{ .Major }}-i386
+      - omoide/dynasc:{{ .Major }}-amd64
+      - omoide/dynasc:{{ .Major }}-arm64
+  - name_template: omoide/dynasc:{{ .Major }}.{{ .Minor }}
     image_templates:
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-i386
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-amd64
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}-arm64
-  - name_template: omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}-i386
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}-amd64
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}-arm64
+  - name_template: omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}
     image_templates:
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64
-      - omoidecom/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-i386
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-amd64
+      - omoide/dynasc:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-arm64
 
 archives:
   - format: tar.gz
