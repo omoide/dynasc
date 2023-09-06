@@ -14,6 +14,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// App version embedded at the build by ldflags.
+var version string
+
 // RootOption represents options for the root command.
 type RootOption struct {
 	Triggers       map[string][]string `mapstructure:"-"`
@@ -42,7 +45,7 @@ func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "dynasc",
 		Long:          "Dynasc is a client tool for processing stream records \nwritten by DynamoDB Streams.\n\nThis tool reads the stream records from the any shards in \nDynamoDB Streams and invokes any lambda functions with the \npayloads that contain the DynamoDB Streams record event.",
-		Version:       "v1.0.0",
+		Version:       version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
