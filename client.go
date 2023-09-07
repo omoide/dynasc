@@ -3,7 +3,6 @@ package dynasc
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodbstreams"
@@ -70,11 +69,15 @@ type DBClient interface {
 
 // NewDBClient returns a client of Amazon DynamoDB.
 func NewDBClient(ctx context.Context, endpoint string) (*dynamodb.Client, error) {
-	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
+	config, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
-	return dynamodb.NewFromConfig(config), nil
+	return dynamodb.NewFromConfig(config, func(o *dynamodb.Options) {
+		if endpoint != "" {
+			o.BaseEndpoint = &endpoint
+		}
+	}), nil
 }
 
 type DBStreamsClient interface {
@@ -86,11 +89,15 @@ type DBStreamsClient interface {
 
 // NewDBStreamsClient returns a client of Amazon DynamoDB Streams.
 func NewDBStreamsClient(ctx context.Context, endpoint string) (*dynamodbstreams.Client, error) {
-	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
+	config, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
-	return dynamodbstreams.NewFromConfig(config), nil
+	return dynamodbstreams.NewFromConfig(config, func(o *dynamodbstreams.Options) {
+		if endpoint != "" {
+			o.BaseEndpoint = &endpoint
+		}
+	}), nil
 }
 
 // LambdaClient represents interfaces of AWS Lambda client.
@@ -165,17 +172,13 @@ type LambdaClient interface {
 
 // NewLambdaClient returns a client of AWS Lambda.
 func NewLambdaClient(ctx context.Context, endpoint string) (*lambda.Client, error) {
-	config, err := config.LoadDefaultConfig(ctx, config.WithEndpointResolverWithOptions(endpointResolver(endpoint)))
+	config, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load the AWS default configuration")
 	}
-	return lambda.NewFromConfig(config), nil
-}
-
-func endpointResolver(endpoint string) aws.EndpointResolverWithOptions {
-	return aws.EndpointResolverWithOptionsFunc(func(service, region string, opts ...interface{}) (aws.Endpoint, error) {
-		return aws.Endpoint{
-			URL: endpoint,
-		}, nil
-	})
+	return lambda.NewFromConfig(config, func(o *lambda.Options) {
+		if endpoint != "" {
+			o.BaseEndpoint = &endpoint
+		}
+	}), nil
 }
