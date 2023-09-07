@@ -39,6 +39,9 @@
         "go.toolsManagement.autoUpdate": true,
         "[go]": {
           "editor.defaultFormatter": "golang.go"
+        },
+        "[markdown]": {
+          "editor.wordWrap": "off"
         }
       },
       "extensions": [
