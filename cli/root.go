@@ -105,9 +105,7 @@ func initConfig(cmd *cobra.Command) (*viper.Viper, error) {
 	vi.SetEnvPrefix("dynasc")
 	vi.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	// Define the bindings for the configuration file.
-	if configFile, err := cmd.Flags().GetString("config"); err != nil {
-		return nil, errors.Wrap(err, "failed to get a flag named \"config\" correctly")
-	} else if configFile != "" {
+	if configFile := vi.GetString("config"); configFile != "" {
 		slog.Info(fmt.Sprintf("Using configuration file: %s", configFile))
 		// Set the configuration file.
 		vi.SetConfigFile(configFile)

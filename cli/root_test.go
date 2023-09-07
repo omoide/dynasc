@@ -228,17 +228,6 @@ func TestInitConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "Abnormal: the config flag does not defined",
-			in: &in{
-				cmd: func(cmd *cobra.Command) *cobra.Command {
-					return cmd
-				},
-			},
-			out: &out{
-				err: errors.New("failed to get a flag named \"config\" correctly"),
-			},
-		},
-		{
 			name: "Abnormal: the specified configuration file does not exist",
 			in: &in{
 				cmd: func(cmd *cobra.Command) *cobra.Command {
