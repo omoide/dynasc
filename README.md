@@ -6,6 +6,7 @@ A cross-platform client tool for DynamoDB Streams written in Go.
 [![GitHub Actions](https://github.com/omoidecom/dynasc/actions/workflows/test.yaml/badge.svg)](https://github.com/omoidecom/dynasc/actions?query=branch%3Amaster+workflow%3Atest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/omoidecom/dynasc)](https://goreportcard.com/report/github.com/omoidecom/dynasc)
 [![GoDoc](https://godoc.org/github.com/omoidecom/dynasc?status.svg)](https://godoc.org/github.com/omoidecom/dynasc)
+[![Docker Pulls](https://img.shields.io/docker/pulls/omoide/dynasc.svg)](https://hub.docker.com/r/omoide/dynasc/)
 
 ## Overview
 
