@@ -52,7 +52,85 @@ dynasc -v
 
 ## Usage
 
-To be written.
+Start a client:
+
+```
+dynasc --dynamodb-endpoint http://localhost:8000 --lambda-endpoint http://localhost:3000 --triggers TableA=Function1,TableB=Function2
+```
+
+You can configure Dynasc in in several ways, such as system or user environment variables, a local configuration file, or explicitly declared command line options.  
+Configuration settings take precedence in the following order. Each item takes precedence over the item below it:
+
+1. command line options
+2. environment variables
+3. configuration file
+
+### Command line options
+
+You can use the following command line options to override any configuration file setting, or environment variable setting.
+
+| Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --dynamo-endpoint _\<string\>_ | Specifies an Amazon DynamoDB endpoint to read stream records.<br />You need to specify this endpoint, if you are emulating Amazon DynamoDB in local using tools such as [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) or [Local Stack](https://docs.localstack.cloud/user-guide/aws/dynamodb/).<br /> If this option is not specified, the standard service endpoint is used automatically based on the specified AWS Region.                                                                |
+| --lambda-endpoint _\<string\>_ | Specifies an AWS Lambda endpoint to execute functions.<br />You need to specify this endpoint, if you are emulating AWS Lambda in local using tools such as [AWS SAM CLI](https://github.com/aws/aws-sam-cli).<br /> If this option is not specified, the standard service endpoint is used automatically based on the specified AWS Region.                                                                                                                                                                                                         |
+| --triggers _\<string\>_        | Specifies trigger definition consisting of a set of key-value pairs of Amazon DynamoDB table names and AWS Lambda function names.<br /><br />Multiple key-value pairs are separated by commas, for example: `TableA=Function1,TableB=Function2`.<br />You can also define multiple functions for the same table, for example: `TableA=Function1,TableA=Function2`.<br /><br />Based on this definition, Dynasc polls shards in the streams of the specified tables. When stream records are available, Dynasc invokes corresponding Lambda function. |
+| --config _\<string\>_          | Specifies a path and file name of the configuration file containing default parameter values to use.<br /> For more information about configuration files, see [configuration file](#configuration-file).                                                                                                                                                                                                                                                                                                                                            |
+| -d, --debug                    | A Boolean switch that enables debug logging.<br />The --debug option provides the full Go logs. This includes additional stderr diagnostic information about the operation of the command that can be useful when troubleshooting why a command provides unexpected results.                                                                                                                                                                                                                                                                         |
+| -h, --help                     | A Boolean switch that displays help for the options.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -v, --version                  | A Boolean switch that displays the current version of Dynasc.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+### Ennvironment variables
+
+Environment variables provide another way to specify configuration options.  
+Dynasc supports the following environment variables.
+
+| Option                 | Description                                                                                                                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS_REGION             | Specifies the AWS Region to send the request to.                                                                                                                              |
+| AWS_ACCESS_KEY_ID      | Specifies an AWS access key associated with an IAM account.                                                                                                                   |
+| AWS_SECRET_ACCESS_KEY  | Specifies the secret key associated with the access key.                                                                                                                      |
+| DYNASC_DYNAMO_ENDPOINT | Same as the command line `--dynamo-endpoint` option.                                                                                                                          |
+| DYNASC_LAMBDA_ENDPOINT | Same as the command line `--lambad-endpoint` option.                                                                                                                          |
+| DYNASC_TRIGGERS        | Same as the command line `--triggers` option.<br />However, multiple key-value par must be separated by spaces, not commas, for example: `TableA=Function1 TableB=Function2`. |
+| DYNASC_CONFIG          | Same as the command line `--config` option.                                                                                                                                   |
+
+If you use a local DynamoDB or Lambda that cares about credentials, you will specify `AWS_REGION`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+### Configurationn file
+
+Dynasc supports a configuration file that you can use to configure Dynasc command parameter values.  
+Supported formats are `JSON`, `YAML`, `TOML`, and `HCL`.
+
+Samples of condfiguration file are as follows.
+
+#### JSON
+
+```json
+{
+  "dynamo-endpoint": "http://localhost:8000",
+  "lambda-endpoint": "http://localhost:3001",
+  "triggers": [
+    { "table": "Table1", "functions": ["Function1", "Function2"] },
+    { "table": "Table2", "functions": "Function1" }
+  ]
+}
+```
+
+#### YAML
+
+```yaml
+dynamo-endpoint: http://localhost:8000
+lambda-endpoint: http://localhost:3001
+triggers:
+  - table: Table1
+    functions:
+      - Function1
+      - Function2
+  - table: Table2
+    functions: Function1
+```
+
+As you can see from the samples above, `functions` element of trigger can be specified as `string` or `array of strings`.
 
 ## License
 
