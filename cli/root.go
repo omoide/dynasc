@@ -69,9 +69,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug logging.")
 	cmd.PersistentFlags().String("config", "", "Configuration file containing default parameter values.")
 	// Define the local flags.
-	cmd.Flags().StringSlice("triggers", []string{}, "Trigger definition consisting of a set of key-value pairs of Amazon DynamoDB table names and Lambda function names.")
-	cmd.Flags().String("dynamo-endpoint", "", "Amazon DynamoDB endpoint to read the stream records.")
-	cmd.Flags().String("lambda-endpoint", "", "AWS Lambda endpoint to execute the function.")
+	cmd.Flags().StringSlice("triggers", []string{}, "Trigger definition consisting of a set of key-value pairs of Amazon DynamoDB table names and AWS Lambda function names.")
+	cmd.Flags().String("dynamo-endpoint", "", "Amazon DynamoDB endpoint to read stream records.")
+	cmd.Flags().String("lambda-endpoint", "", "AWS Lambda endpoint to execute functions.")
 	return cmd
 }
 

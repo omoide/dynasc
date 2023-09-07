@@ -72,7 +72,7 @@ func TestNewRootCmd(t *testing.T) {
 			flag: &flag{
 				name:       "triggers",
 				shorthand:  "",
-				usage:      "Trigger definition consisting of a set of key-value pairs of Amazon DynamoDB table names and Lambda function names.",
+				usage:      "Trigger definition consisting of a set of key-value pairs of Amazon DynamoDB table names and AWS Lambda function names.",
 				value:      "[]",
 				persistent: false,
 			},
@@ -82,7 +82,7 @@ func TestNewRootCmd(t *testing.T) {
 			flag: &flag{
 				name:       "dynamo-endpoint",
 				shorthand:  "",
-				usage:      "Amazon DynamoDB endpoint to read the stream records.",
+				usage:      "Amazon DynamoDB endpoint to read stream records.",
 				value:      "",
 				persistent: false,
 			},
@@ -92,7 +92,7 @@ func TestNewRootCmd(t *testing.T) {
 			flag: &flag{
 				name:       "lambda-endpoint",
 				shorthand:  "",
-				usage:      "AWS Lambda endpoint to execute the function.",
+				usage:      "AWS Lambda endpoint to execute functions.",
 				value:      "",
 				persistent: false,
 			},
