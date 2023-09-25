@@ -19,7 +19,7 @@ builds:
       - arm64
     # Custom ldflags.
     ldflags:
-      - -s -w -X github.com/omoidecom/dynasc/cli.version={{.Version}}
+      - -s -w -X github.com/omoide/dynasc/cli.version={{.Version}}
 
 dockers:
   # Linux i386

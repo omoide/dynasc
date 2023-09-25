@@ -2,10 +2,10 @@
 
 A cross-platform client tool for DynamoDB Streams written in Go.
 
-[![Release](https://img.shields.io/github/release/omoidecom/dynasc.svg?label=Release)](https://github.com/omoidecom/dynasc/releases)
-[![GitHub Actions](https://github.com/omoidecom/dynasc/actions/workflows/test.yaml/badge.svg)](https://github.com/omoidecom/dynasc/actions?query=branch%3Amaster+workflow%3Atest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/omoidecom/dynasc)](https://goreportcard.com/report/github.com/omoidecom/dynasc)
-[![GoDoc](https://godoc.org/github.com/omoidecom/dynasc?status.svg)](https://godoc.org/github.com/omoidecom/dynasc)
+[![Release](https://img.shields.io/github/release/omoide/dynasc.svg?label=Release)](https://github.com/omoide/dynasc/releases)
+[![GitHub Actions](https://github.com/omoide/dynasc/actions/workflows/test.yaml/badge.svg)](https://github.com/omoide/dynasc/actions?query=branch%3Amaster+workflow%3Atest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/omoide/dynasc)](https://goreportcard.com/report/github.com/omoide/dynasc)
+[![GoDoc](https://godoc.org/github.com/omoide/dynasc?status.svg)](https://godoc.org/github.com/omoide/dynasc)
 [![Docker Pulls](https://img.shields.io/docker/pulls/omoide/dynasc.svg)](https://hub.docker.com/r/omoide/dynasc/)
 
 ## Overview
@@ -24,7 +24,7 @@ The primary use case is to emulate the integration of Amazon DynamoDB and AWS La
 ### Pre-Build binaries
 
 Prebuilt binaries are available for a variety of operating systems and architectures.
-Visit the [latest release](https://github.com/omoidecom/dynasc/releases/latest) page, and scroll down to the Assets section.
+Visit the [latest release](https://github.com/omoide/dynasc/releases/latest) page, and scroll down to the Assets section.
 
 1. Download the archive for the desired operating system and architecture.
 2. Extract the archive.
@@ -46,7 +46,7 @@ To build from source you must:
 Then build and test:
 
 ```
-go install github.com/omoidecom/dynasc/cmd/dynasc@latest
+go install github.com/omoide/dynasc/cmd/dynasc@latest
 dynasc -v
 ```
 

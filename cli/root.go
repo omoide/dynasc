@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/errors"
-	"github.com/omoidecom/dynasc"
+	"github.com/omoide/dynasc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

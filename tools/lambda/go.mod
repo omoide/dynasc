@@ -1,4 +1,4 @@
-module github.com/omoidecom/dynasc/tools/lambda
+module github.com/omoide/dynasc/tools/lambda
 
 go 1.21.0
 
