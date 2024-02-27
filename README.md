@@ -55,7 +55,7 @@ dynasc -v
 Start a client:
 
 ```
-dynasc --dynamodb-endpoint http://localhost:8000 --lambda-endpoint http://localhost:3000 --triggers TableA=Function1,TableB=Function2
+dynasc --dynamo-endpoint http://localhost:8000 --lambda-endpoint http://localhost:3000 --triggers TableA=Function1,TableB=Function2
 ```
 
 You can configure Dynasc in in several ways, such as system or user environment variables, a local configuration file, or explicitly declared command line options.  
