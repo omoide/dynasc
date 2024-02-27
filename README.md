@@ -41,7 +41,7 @@ If you do not see a prebuilt binary for the desired operating system and archite
 To build from source you must:
 
 1. Install [Git](https://git-scm.com/).
-2. Install [Go](https://go.dev/) version 1.21 or later.
+2. Install [Go](https://go.dev/) version 1.22 or later.
 
 Then build and test:
 

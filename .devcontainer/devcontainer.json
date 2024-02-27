@@ -19,7 +19,7 @@
       "version": "20.10"
     },
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.21"
+      "version": "1.22"
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {
       "version": "2.13.14"
