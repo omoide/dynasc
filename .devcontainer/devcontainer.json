@@ -22,7 +22,10 @@
       "version": "1.22"
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {
-      "version": "2.13.14"
+      "version": "2.15.23"
+    },
+    "ghcr.io/customink/codespaces-features/sam-cli": {
+      "version": "1.110.0"
     }
   },
 
