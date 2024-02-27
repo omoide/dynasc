@@ -162,6 +162,9 @@ func initRootOption(cmd *cobra.Command) (*RootOption, error) {
 
 // rootRun executes a main process of the root command.
 func rootRun(ctx context.Context, opt *RootOption) error {
+	if len(opt.Triggers) == 0 {
+		return errors.New("at least one trigger must be defined")
+	}
 	db, err := dynasc.NewDBClient(ctx, opt.DynamoEndpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to create a client of DynamoDB")
